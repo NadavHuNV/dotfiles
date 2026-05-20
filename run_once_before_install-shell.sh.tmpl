@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+{{- if eq .chezmoi.os "linux" }}
+set -euo pipefail
+
+echo "==> Installing zsh, git, curl (via package manager)"
+if command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get update -qq
+    sudo apt-get install -y zsh git curl
+elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y zsh git curl
+elif command -v yum >/dev/null 2>&1; then
+    sudo yum install -y zsh git curl
+elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman -Sy --noconfirm zsh git curl
+else
+    echo "No known package manager (apt/dnf/yum/pacman). Install zsh, git, curl manually."
+    exit 1
+fi
+
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    echo "==> Installing Oh My Zsh"
+    RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+fi
+
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+    echo "==> Cloning zsh-autosuggestions"
+    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+fi
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+    echo "==> Cloning zsh-syntax-highlighting"
+    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+fi
+
+ZSH_PATH="$(command -v zsh)"
+if [ -n "$ZSH_PATH" ] && [ "$(basename "${SHELL:-}")" != "zsh" ]; then
+    echo "==> Setting zsh as default shell"
+    sudo chsh -s "$ZSH_PATH" "$USER" 2>/dev/null \
+        || sudo usermod -s "$ZSH_PATH" "$USER" 2>/dev/null \
+        || echo "(could not change default shell automatically; run: chsh -s $ZSH_PATH)"
+fi
+{{- else }}
+echo "Skipping Linux install hook on {{ .chezmoi.os }} (assuming zsh + Oh My Zsh already installed)."
+{{- end }}

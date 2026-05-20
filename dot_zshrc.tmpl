@@ -1,0 +1,63 @@
+# Oh My Zsh
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="robbyrussell"
+
+plugins=(
+  git                       # git aliases and branch info in prompt
+{{- if eq .chezmoi.os "darwin" }}
+  macos                     # handy mac shortcuts (e.g. `man-preview`)
+{{- end }}
+  zsh-autosuggestions       # suggests commands as you type (accept with →)
+  zsh-syntax-highlighting   # colors commands green/red as you type (must be last)
+)
+
+source $ZSH/oh-my-zsh.sh
+
+# ── PATH ────────────────────────────────────────────────────────────────────
+{{- if eq .chezmoi.os "darwin" }}
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
+{{- else }}
+export PATH="$HOME/.local/bin:$PATH"
+{{- end }}
+
+# ── History ─────────────────────────────────────────────────────────────────
+HISTSIZE=10000
+SAVEHIST=10000
+setopt HIST_IGNORE_DUPS    # don't save duplicate commands
+setopt HIST_IGNORE_SPACE   # don't save commands that start with a space
+setopt SHARE_HISTORY       # share history across terminal tabs
+
+# ── Navigation ──────────────────────────────────────────────────────────────
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias ll="ls -lah"         # long list with hidden files + human-readable sizes
+alias la="ls -A"           # list all including hidden
+
+# ── Git shortcuts ────────────────────────────────────────────────────────────
+alias gs="git status"
+alias ga="git add"
+alias gaa="git add --all"
+alias gc="git commit -m"   # usage: gc "your message"
+alias gca="git commit --amend"
+alias gp="git push"
+alias gpl="git pull"
+alias gl="git log --oneline --graph --decorate --all"
+alias gd="git diff"
+alias gb="git branch"
+alias gco="git checkout"
+alias gcb="git checkout -b"  # create and switch to a new branch
+alias gst="git stash"
+alias gstp="git stash pop"
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+alias reload="source ~/.zshrc"          # reload config without restarting terminal
+{{- if eq .chezmoi.os "darwin" }}
+alias zshconfig="open -e ~/.zshrc"      # open this file in TextEdit
+{{- else }}
+alias zshconfig='${EDITOR:-vi} ~/.zshrc'  # open this file in $EDITOR (or vi)
+{{- end }}
+alias myip="curl -s ifconfig.me"        # show your public IP
+
+# ── Prompt: show full path (~/a/b/c) instead of just last segment ────────────
+PROMPT="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ )%{$fg[cyan]%}%~%{$reset_color%} "'$(git_prompt_info)'
