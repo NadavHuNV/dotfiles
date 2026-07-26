@@ -53,7 +53,8 @@
       "Bash(readlink:*)",
       "Bash(basename:*)",
       "Bash(dirname:*)",
-      "Bash(realpath:*)"{{ if ne .chezmoi.os "darwin" }},
+      "Bash(realpath:*)",
+      "Bash(ssh *)"{{ if ne .chezmoi.os "darwin" }},
       "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(systemctl status:*)",
@@ -62,5 +63,9 @@
       "Bash(rpm:*)",
       "Bash(dpkg:*)"{{ end }}
     ]
-  }
+  },
+  "model": "opus[1m]",
+  "effortLevel": "xhigh",
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true
 }

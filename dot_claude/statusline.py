@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 import sys, json, os, time
 
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except Exception:
+    pass
+
 CACHE_FILE = os.path.expanduser('~/.claude/.usage_cache.json')
 CACHE_TTL = 60
 ORG_UUID = 'ae6cdefa-a29d-44f9-af49-72d85aede8c8'
