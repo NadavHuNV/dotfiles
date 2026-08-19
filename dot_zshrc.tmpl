@@ -25,6 +25,15 @@ export PATH="$HOME/.local/bin:$PATH"
 # Tradeoff: scroll wheel inside Claude Code pages instead of scrolling by line.
 export CLAUDE_CODE_DISABLE_MOUSE=1
 
+# ── Terminal mouse reset ─────────────────────────────────────────────────────
+# After sleep/lid-close/SSH disconnect, apps that enabled mouse tracking may
+# die without sending the disable escape, leaving raw sequences in the prompt.
+# This hook resets all mouse modes + kitty keyboard protocol before every prompt.
+_reset_terminal_modes() {
+  printf '\e[?1000l\e[?1002l\e[?1003l\e[?1006l\e[<u' 2>/dev/null
+}
+precmd_functions+=(_reset_terminal_modes)
+
 # ── History ─────────────────────────────────────────────────────────────────
 HISTSIZE=10000
 SAVEHIST=10000
